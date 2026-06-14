@@ -1,0 +1,23 @@
+name: weather_app
+description: A simple weather app using Dio for networking.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.7.0
+  geolocator: ^13.0.1
+  shared_preferences: ^2.3.2
+  material_symbols_icons: ^4.49.0
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
