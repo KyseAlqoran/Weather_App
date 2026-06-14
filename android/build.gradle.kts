@@ -17,14 +17,6 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
-
-    // Force all plugins to compile against SDK 36 and NDK 28
-    plugins.withId("com.android.library") {
-        extensions.configure<com.android.build.gradle.LibraryExtension> {
-            compileSdk = 36
-            ndkVersion = "28.2.13676358"
-        }
-    }
 }
 
 tasks.register<Delete>("clean") {

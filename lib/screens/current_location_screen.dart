@@ -3,7 +3,6 @@ import 'package:geolocator/geolocator.dart';
 import '../models/weather_model.dart';
 import '../services/weather_service.dart';
 import '../widgets/weather_view.dart';
-import 'package:geocoding/geocoding.dart' as geo;
 
 class CurrentLocationScreen extends StatefulWidget {
   final bool isCelsius;
@@ -40,13 +39,11 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
     });
 
     try {
-      // 1. Check location service is on
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Location services are disabled.');
       }
 
-      // 2. Check permission
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -58,52 +55,27 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
         throw Exception('Location permissions are permanently denied.');
       }
 
-      // 3. Get the position
       Position position = await Geolocator.getCurrentPosition();
 
-<<<<<<< HEAD
-      // 4. Build a location (labeled "My Location")
-=======
-      String cityName = 'Current Location';
-      String countryName = '';
-
-      try {
-        final placemarks = await geo.placemarkFromCoordinates(
-          position.latitude,
-          position.longitude,
-        );
-
-        if (placemarks.isNotEmpty) {
-          final place = placemarks.first;
-
-          cityName = place.locality?.isNotEmpty == true
-              ? place.locality!
-              : place.subAdministrativeArea?.isNotEmpty == true
-                  ? place.subAdministrativeArea!
-                  : place.administrativeArea?.isNotEmpty == true
-                      ? place.administrativeArea!
-                      : 'Current Location';
-
-          countryName = place.country ?? '';
-        }
-      } catch (_) {
-        cityName = 'Current Location';
-        countryName = '';
-      }
-
->>>>>>> 40f5d9d (Version 3)
-      final location = Location(
-        name: cityName,
-        country: countryName,
-        latitude: position.latitude,
-        longitude: position.longitude,
-      );
-
-      // 5. Get the weather
       final weatherData = await _weatherService.getWeather(
         position.latitude,
         position.longitude,
       );
+
+      Location location;
+      try {
+        location = await _weatherService.reverseGeocode(
+          position.latitude,
+          position.longitude,
+        );
+      } catch (e) {
+        location = Location(
+          name: 'My Location',
+          country: '',
+          latitude: position.latitude,
+          longitude: position.longitude,
+        );
+      }
 
       if (mounted) {
         setState(() {
@@ -125,14 +97,12 @@ class _CurrentLocationScreenState extends State<CurrentLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Loading spinner
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );
     }
 
-    // Error message with a try again button
     if (_errorMessage != null) {
       return Center(
         child: Column(

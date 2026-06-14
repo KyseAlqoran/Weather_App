@@ -8,7 +8,6 @@ class WeatherBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pick the two gradient colors
     List<Color> colors;
     if (weatherData == null) {
       colors = [const Color(0xFF1B3A5C), const Color(0xFF4A7FB5)];
@@ -19,7 +18,6 @@ class WeatherBackground extends StatelessWidget {
       );
     }
 
-    // A Container with a gradient (like the billionaire app, but gradient instead of solid color)
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(

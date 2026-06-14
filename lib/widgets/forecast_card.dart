@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 
 class ForecastCard extends StatelessWidget {
@@ -34,20 +33,21 @@ class ForecastCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dayName = _getDayName(forecast.date);
-    final iconSvg = WeatherUtils.getWeatherSvg(forecast.weatherCode);
+    final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
+    final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
 
-    // Bar positions (min and max as fraction of the weekly range)
     final totalRange = weeklyMax - weeklyMin;
-    final double startFraction =
-        totalRange > 0 ? (forecast.minTemp - weeklyMin) / totalRange : 0.0;
-    final double endFraction =
-        totalRange > 0 ? (forecast.maxTemp - weeklyMin) / totalRange : 1.0;
+    final double startFraction = totalRange > 0
+        ? (forecast.minTemp - weeklyMin) / totalRange
+        : 0.0;
+    final double endFraction = totalRange > 0
+        ? (forecast.maxTemp - weeklyMin) / totalRange
+        : 1.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          // Day name
           SizedBox(
             width: 58,
             child: Text(
@@ -62,12 +62,7 @@ class ForecastCard extends StatelessWidget {
               ),
             ),
           ),
-          // Weather icon
-          SizedBox(
-            width: 40,
-            child: SvgPicture.asset(iconSvg, width: 26, height: 26),
-          ),
-          // Low temp
+          SizedBox(width: 40, child: Icon(icon, color: iconColor, size: 22)),
           SizedBox(
             width: 38,
             child: Text(
@@ -79,15 +74,9 @@ class ForecastCard extends StatelessWidget {
               ),
             ),
           ),
-          const Spacer(),
-          const SizedBox(width: 12),
-          // Range bar (fixed short width, like iPhone)
-          SizedBox(
-            width: 120,
-            child: _buildBar(startFraction, endFraction),
-          ),
-          const SizedBox(width: 12),
-          // High temp
+          const SizedBox(width: 10),
+          Expanded(child: _buildBar(startFraction, endFraction)),
+          const SizedBox(width: 10),
           SizedBox(
             width: 38,
             child: Text(
@@ -105,7 +94,6 @@ class ForecastCard extends StatelessWidget {
     );
   }
 
-  // The colored temperature bar. Built with simple Containers and a Stack.
   Widget _buildBar(double startFraction, double endFraction) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -116,7 +104,6 @@ class ForecastCard extends StatelessWidget {
 
         return Stack(
           children: [
-            // Grey track
             Container(
               height: 5,
               decoration: BoxDecoration(
@@ -124,7 +111,6 @@ class ForecastCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
-            // Colored part (gradient from the low color to the high color)
             Padding(
               padding: EdgeInsets.only(left: barStart),
               child: Container(

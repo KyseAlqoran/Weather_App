@@ -4,8 +4,6 @@ import 'screens/main_navigation_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Make the phone's status bar and nav bar see-through so the
-  // gradient shows behind them (the iPhone edge-to-edge look).
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -25,6 +23,9 @@ class WeatherApp extends StatelessWidget {
     return MaterialApp(
       title: 'Weather',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        iconTheme: const IconThemeData(fill: 1.0),
+      ),
       home: const MainNavigationScreen(),
     );
   }

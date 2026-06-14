@@ -14,32 +14,48 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
   bool _isCelsius = true;
-  WeatherData? _currentWeatherData;
+  WeatherData? _myLocationWeatherData;
+  WeatherData? _searchWeatherData;
 
-  void _onWeatherLoaded(WeatherData data) {
+  WeatherData? get _currentWeatherData {
+    if (_currentIndex == 0) return _myLocationWeatherData;
+    return _searchWeatherData ?? _myLocationWeatherData;
+  }
+
+  void _onMyLocationWeatherLoaded(WeatherData data) {
     setState(() {
-      _currentWeatherData = data;
+      _myLocationWeatherData = data;
+    });
+  }
+
+  void _onSearchWeatherLoaded(WeatherData data) {
+    setState(() {
+      _searchWeatherData = data;
+    });
+  }
+
+  void _onTabChanged(int index) {
+    setState(() {
+      _currentIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // The two pages
     final pages = [
       CurrentLocationScreen(
         isCelsius: _isCelsius,
-        onWeatherLoaded: _onWeatherLoaded,
+        onWeatherLoaded: _onMyLocationWeatherLoaded,
       ),
       SearchScreen(
         isCelsius: _isCelsius,
-        onWeatherLoaded: _onWeatherLoaded,
+        onWeatherLoaded: _onSearchWeatherLoaded,
       ),
     ];
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
-      // No AppBar (like iPhone). Gradient fills the screen, content on top.
       body: Stack(
         children: [
           WeatherBackground(weatherData: _currentWeatherData),
@@ -48,7 +64,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // Top row: just the °C / °F toggle on the right
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -67,12 +82,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       ),
                     ),
                   ),
-                  // The current page fills the rest
                   Expanded(
-                    child: IndexedStack(
-                      index: _currentIndex,
-                      children: pages,
-                    ),
+                    child: IndexedStack(index: _currentIndex, children: pages),
                   ),
                 ],
               ),
@@ -80,12 +91,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ),
         ],
       ),
-      // Our own see-through bottom bar
       bottomNavigationBar: _buildBottomBar(),
     );
   }
 
-  // A simple see-through bottom bar built with Container + Row (example style)
   Widget _buildBottomBar() {
     return Container(
       decoration: BoxDecoration(
@@ -116,11 +125,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget _buildTab(IconData icon, String label, int index) {
     final bool isActive = _currentIndex == index;
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
+      onTap: () => _onTabChanged(index),
       behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

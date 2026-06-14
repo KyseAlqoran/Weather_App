@@ -12,16 +12,12 @@ dependencies:
   dio: ^5.7.0
   geolocator: ^13.0.1
   shared_preferences: ^2.3.2
-<<<<<<< HEAD
-  flutter_svg: ^2.0.10
-=======
-  geocoding: ^4.0.0
->>>>>>> 40f5d9d (Version 3)
+  material_symbols_icons: ^4.49.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/weather/
