@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class Location {
   final String name;
@@ -61,7 +60,7 @@ class CurrentWeather {
       humidity: json['relative_humidity_2m'] ?? 0,
       windSpeed: (json['wind_speed_10m'] ?? 0).toDouble(),
       weatherCode: json['weather_code'] ?? 0,
-      surfacePressure: (json['surface_pressure'] ?? 0).toDouble(),
+      surfacePressure: (json['pressure_msl'] ?? 0).toDouble(),
       visibility: (json['visibility'] ?? 0).toDouble(),
       isDay: json['is_day'] ?? 1,
     );
@@ -182,37 +181,24 @@ class WeatherUtils {
     return 'Unknown';
   }
 
-  static IconData getWeatherIcon(int code, {bool isDay = true}) {
+  static String getWeatherIcon(int code, {bool isDay = true}) {
     if (code == 0) {
-      return isDay ? Symbols.sunny : Symbols.clear_night;
+      return isDay ? 'assets/weather/sunny.svg' : 'assets/weather/night.svg';
     }
     if (code == 1 || code == 2) {
-      return isDay ? Symbols.partly_cloudy_day : Symbols.partly_cloudy_night;
+      return isDay
+          ? 'assets/weather/partly_cloudy.svg'
+          : 'assets/weather/night.svg';
     }
-    if (code == 3) return Symbols.cloudy;
-    if (code >= 45 && code <= 48) return Symbols.foggy;
-    if (code >= 51 && code <= 55) return Symbols.rainy_light;
-    if (code >= 61 && code <= 65) return Symbols.rainy;
-    if (code >= 71 && code <= 75) return Symbols.weather_snowy;
-    if (code >= 80 && code <= 82) return Symbols.rainy_heavy;
-    if (code >= 85 && code <= 86) return Symbols.cloudy_snowing;
-    if (code == 95 || code == 99) return Symbols.thunderstorm;
-    return Symbols.thermostat;
-  }
-
-  static Color getWeatherIconColor(int code, {bool isDay = true}) {
-    if (code == 0 || code == 1) {
-      return isDay ? const Color(0xFFFBBF24) : const Color(0xFFE2E8F0);
-    }
-    if (code == 2 || code == 3) return const Color(0xFFE2E8F0);
-    if (code >= 45 && code <= 48) return const Color(0xFFE2E8F0);
-    if (code >= 51 && code <= 55) return const Color(0xFF93C5FD);
-    if (code >= 61 && code <= 65) return const Color(0xFF93C5FD);
-    if (code >= 71 && code <= 75) return const Color(0xFFE2E8F0);
-    if (code >= 80 && code <= 82) return const Color(0xFF93C5FD);
-    if (code >= 85 && code <= 86) return const Color(0xFFE2E8F0);
-    if (code == 95 || code == 99) return const Color(0xFFFBBF24);
-    return const Color(0xFFE2E8F0);
+    if (code == 3) return 'assets/weather/cloud.svg';
+    if (code >= 45 && code <= 48) return 'assets/weather/cloud.svg';
+    if (code >= 51 && code <= 55) return 'assets/weather/drizzle.svg';
+    if (code >= 61 && code <= 65) return 'assets/weather/rain.svg';
+    if (code >= 71 && code <= 75) return 'assets/weather/snow.svg';
+    if (code >= 80 && code <= 82) return 'assets/weather/rain.svg';
+    if (code >= 85 && code <= 86) return 'assets/weather/snow.svg';
+    if (code == 95 || code == 99) return 'assets/weather/storm.svg';
+    return 'assets/weather/cloud.svg';
   }
 
   static List<Color> getBackgroundColors(int code, int isDay) {

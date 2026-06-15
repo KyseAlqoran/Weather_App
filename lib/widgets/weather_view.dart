@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 import 'forecast_card.dart';
 import 'hourly_forecast_card.dart';
@@ -7,6 +8,7 @@ class WeatherView extends StatelessWidget {
   final Location currentLocation;
   final WeatherData weatherData;
   final bool isCelsius;
+  final bool isMetric;
   final Future<void> Function() onRefresh;
 
   const WeatherView({
@@ -14,6 +16,7 @@ class WeatherView extends StatelessWidget {
     required this.currentLocation,
     required this.weatherData,
     required this.isCelsius,
+    this.isMetric = true,
     required this.onRefresh,
   });
 
@@ -46,11 +49,6 @@ class WeatherView extends StatelessWidget {
       current.weatherCode,
       isDay: current.isDay == 1,
     );
-    final iconColor = WeatherUtils.getWeatherIconColor(
-      current.weatherCode,
-      isDay: current.isDay == 1,
-    );
-
     final now = DateTime.now();
     final upcomingHourly = weatherData.hourly
         .where((h) => h.date.isAfter(now.subtract(const Duration(hours: 1))))
@@ -88,7 +86,11 @@ class WeatherView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Icon(icon, color: iconColor, size: 72),
+            SvgPicture.asset(
+              icon,
+              width: 72,
+              height: 72,
+            ),
             const SizedBox(height: 8),
             Text(
               _formatTemp(current.temperature),
@@ -198,16 +200,22 @@ class WeatherView extends StatelessWidget {
       childAspectRatio: 1.4,
       children: [
         _tile(
-          Icons.wb_sunny,
-          'UV INDEX',
-          daily != null ? daily.uvIndexMax.round().toString() : '--',
-        ),
-        _tile(
           Icons.wb_twilight,
           'SUNRISE',
           daily != null ? _formatTime(daily.sunrise) : '--',
         ),
-        _tile(Icons.air, 'WIND', '${current.windSpeed.round()} km/h'),
+        _tile(
+          Icons.nights_stay,
+          'SUNSET',
+          daily != null ? _formatTime(daily.sunset) : '--',
+        ),
+        _tile(
+          Icons.air,
+          'WIND',
+          isMetric
+              ? '${current.windSpeed.round()} km/h'
+              : '${(current.windSpeed * 0.621371).round()} mph',
+        ),
         _tile(
           Icons.water_drop,
           'RAINFALL',
@@ -222,7 +230,9 @@ class WeatherView extends StatelessWidget {
         _tile(
           Icons.visibility,
           'VISIBILITY',
-          '${(current.visibility / 1000).toStringAsFixed(0)} km',
+          isMetric
+              ? '${(current.visibility / 1000).toStringAsFixed(0)} km'
+              : '${(current.visibility / 1609.344).toStringAsFixed(0)} mi',
         ),
         _tile(
           Icons.speed,

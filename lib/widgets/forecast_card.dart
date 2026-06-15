@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 
 class ForecastCard extends StatelessWidget {
@@ -34,7 +35,6 @@ class ForecastCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final dayName = _getDayName(forecast.date);
     final icon = WeatherUtils.getWeatherIcon(forecast.weatherCode);
-    final iconColor = WeatherUtils.getWeatherIconColor(forecast.weatherCode);
 
     final totalRange = weeklyMax - weeklyMin;
     final double startFraction = totalRange > 0
@@ -62,7 +62,14 @@ class ForecastCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(width: 40, child: Icon(icon, color: iconColor, size: 22)),
+          SizedBox(
+            width: 40,
+            child: SvgPicture.asset(
+              icon,
+              width: 22,
+              height: 22,
+            ),
+          ),
           SizedBox(
             width: 38,
             child: Text(

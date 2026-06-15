@@ -202,10 +202,8 @@ class WeatherService {
     final geometry = (feature['geometry'] as Map<String, dynamic>?) ?? {};
     final coords = (geometry['coordinates'] as List<dynamic>?) ?? [];
 
-    double longitude =
-        coords.isNotEmpty ? (coords[0] as num).toDouble() : 0.0;
-    double latitude =
-        coords.length > 1 ? (coords[1] as num).toDouble() : 0.0;
+    double longitude = coords.isNotEmpty ? (coords[0] as num).toDouble() : 0.0;
+    double latitude = coords.length > 1 ? (coords[1] as num).toDouble() : 0.0;
 
     if (latitude == 0.0 && longitude == 0.0) {
       latitude = fallbackLat ?? 0.0;
@@ -240,12 +238,13 @@ class WeatherService {
           'latitude': lat,
           'longitude': lon,
           'current':
-              'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature,surface_pressure,visibility,is_day',
+              'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature,pressure_msl,visibility,is_day',
           'hourly': 'temperature_2m,weather_code',
           'daily':
               'temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum,sunrise,sunset,uv_index_max',
           'timezone': 'auto',
           'forecast_days': 7,
+          'models': 'gfs_seamless',
         },
       );
 

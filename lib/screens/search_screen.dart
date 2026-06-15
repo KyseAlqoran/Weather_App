@@ -7,11 +7,13 @@ import '../widgets/weather_view.dart';
 
 class SearchScreen extends StatefulWidget {
   final bool isCelsius;
+  final bool isMetric;
   final void Function(WeatherData) onWeatherLoaded;
 
   const SearchScreen({
     super.key,
     required this.isCelsius,
+    required this.isMetric,
     required this.onWeatherLoaded,
   });
 
@@ -204,6 +206,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     currentLocation: _currentLocation!,
                     weatherData: _weatherData!,
                     isCelsius: widget.isCelsius,
+                    isMetric: widget.isMetric,
                     onRefresh: () =>
                         _fetchWeather(existingLocation: _currentLocation),
                   )

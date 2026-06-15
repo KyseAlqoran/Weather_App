@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../models/weather_model.dart';
 
 class HourlyForecastCard extends StatelessWidget {
@@ -38,10 +39,6 @@ class HourlyForecastCard extends StatelessWidget {
       forecast.weatherCode,
       isDay: isDay,
     );
-    final iconColor = WeatherUtils.getWeatherIconColor(
-      forecast.weatherCode,
-      isDay: isDay,
-    );
 
     return SizedBox(
       width: 60,
@@ -57,7 +54,11 @@ class HourlyForecastCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Icon(icon, color: iconColor, size: 26),
+          SvgPicture.asset(
+            icon,
+            width: 26,
+            height: 26,
+          ),
           const SizedBox(height: 8),
           Text(
             _formatTemp(forecast.temperature),
