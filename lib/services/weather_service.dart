@@ -15,10 +15,23 @@ class WeatherService {
     'place:village',
   ];
 
+  String? _authToken;
+
+  static const int _maxRetries = 2;
+
+  void setAuthToken(String? token) => _authToken = token;
+
   WeatherService() {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
+          options.headers['User-Agent'] = 'weather_app/1.0';
+          options.headers['Accept'] = 'application/json';
+
+          if (_authToken != null && _authToken!.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $_authToken';
+          }
+
           // ignore: avoid_print
           print('Request sent to: ${options.uri}');
           handler.next(options);
@@ -28,9 +41,31 @@ class WeatherService {
           print('Response code: ${response.statusCode}');
           handler.next(response);
         },
-        onError: (error, handler) {
+        onError: (error, handler) async {
           // ignore: avoid_print
           print('Dio error: ${error.message}');
+
+          final bool isTransient =
+              error.type == DioExceptionType.connectionTimeout ||
+                  error.type == DioExceptionType.receiveTimeout ||
+                  error.type == DioExceptionType.connectionError;
+
+          final options = error.requestOptions;
+          final int attempt = (options.extra['retry_attempt'] as int?) ?? 0;
+
+          if (isTransient && attempt < _maxRetries) {
+            options.extra['retry_attempt'] = attempt + 1;
+            // ignore: avoid_print
+            print('Retrying request (attempt ${attempt + 1})...');
+            await Future.delayed(const Duration(milliseconds: 500));
+            try {
+              final response = await _dio.fetch(options);
+              return handler.resolve(response);
+            } on DioException catch (e) {
+              return handler.next(e);
+            }
+          }
+
           handler.next(error);
         },
       ),
@@ -39,7 +74,9 @@ class WeatherService {
 
   Future<Location?> geocodeCity(String cityName) async {
     final suggestions = await geocodeCitySuggestions(cityName, count: 1);
-    if (suggestions.isNotEmpty) return suggestions.first;
+    if (suggestions.isNotEmpty) {
+      return suggestions.first;
+    }
 
     return _geocodeWithNominatim(cityName.trim());
   }
@@ -58,12 +95,6 @@ class WeatherService {
 
       final response = await _dio.getUri(
         uri,
-        options: Options(
-          headers: {
-            'User-Agent': 'weather_app/1.0',
-            'Accept': 'application/json',
-          },
-        ),
       );
 
       final results = response.data as List<dynamic>? ?? [];
@@ -109,7 +140,10 @@ class WeatherService {
     String cityName, {
     int count = 5,
   }) async {
-    if (cityName.trim().isEmpty) return [];
+    if (cityName.trim().isEmpty) {
+      return [];
+    }
+
     try {
       final uri = Uri.parse('https://photon.komoot.io/api/').replace(
         queryParameters: {
@@ -121,12 +155,6 @@ class WeatherService {
 
       final response = await _dio.getUri(
         uri,
-        options: Options(
-          headers: {
-            'User-Agent': 'weather_app/1.0',
-            'Accept': 'application/json',
-          },
-        ),
       );
       final features = response.data['features'] as List<dynamic>? ?? [];
 
@@ -149,12 +177,6 @@ class WeatherService {
 
       final response = await _dio.getUri(
         uri,
-        options: Options(
-          headers: {
-            'User-Agent': 'weather_app/1.0',
-            'Accept': 'application/json',
-          },
-        ),
       );
       final features = response.data['features'] as List<dynamic>? ?? [];
 
