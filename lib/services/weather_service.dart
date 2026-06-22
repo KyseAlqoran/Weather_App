@@ -74,9 +74,7 @@ class WeatherService {
 
   Future<Location?> geocodeCity(String cityName) async {
     final suggestions = await geocodeCitySuggestions(cityName, count: 1);
-    if (suggestions.isNotEmpty) {
-      return suggestions.first;
-    }
+    if (suggestions.isNotEmpty) return suggestions.first;
 
     return _geocodeWithNominatim(cityName.trim());
   }
@@ -140,10 +138,7 @@ class WeatherService {
     String cityName, {
     int count = 5,
   }) async {
-    if (cityName.trim().isEmpty) {
-      return [];
-    }
-
+    if (cityName.trim().isEmpty) return [];
     try {
       final uri = Uri.parse('https://photon.komoot.io/api/').replace(
         queryParameters: {
